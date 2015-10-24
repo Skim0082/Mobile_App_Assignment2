@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Drawing Example</string>
+    <string name="app_name">Image Processing</string>
     <string name="start_new">New</string>
     <string name="brush">Brush</string>
     <string name="erase">Erase</string>

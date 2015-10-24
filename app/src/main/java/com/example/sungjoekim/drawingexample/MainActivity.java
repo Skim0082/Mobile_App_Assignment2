@@ -269,7 +269,6 @@ public class MainActivity extends Activity implements OnClickListener {
         int photoH = bmOptions.outHeight;
 
         if(photoW > photoH){
-
             photoW = bmOptions.outHeight;
             photoH = bmOptions.outWidth;
         }
@@ -291,10 +290,11 @@ public class MainActivity extends Activity implements OnClickListener {
             Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap,targetH,targetW,true);
             bitmap = Bitmap.createBitmap(scaledBitmap, 0, 0,
                     scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
+        }else{
+            bitmap = Bitmap.createScaledBitmap(bitmap,targetW,targetH,true);
         }
 
         mDrawingView.drawBmp(bitmap);
-
     }
 
     String mCurrentPhotoPath;
@@ -318,7 +318,6 @@ public class MainActivity extends Activity implements OnClickListener {
 
     public void paintClicked(View view){
         //use chosen color
-
         //drawView.setBrushSize(drawView.getLastBrushSize());
 
         if(view!=currPaint){
