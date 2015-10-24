@@ -15,8 +15,6 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.util.TypedValue;
 
-
-
 /**
  * Created by JOE on 2015-10-23.
  */
@@ -42,7 +40,8 @@ public class DrawingView extends View {
     }
 
     private void setupDrawing(){
-    //get drawing area setup for interaction
+
+        //get drawing area setup for interaction
         drawPath = new Path();
         drawPaint = new Paint();
         drawPaint.setColor(paintColor);
@@ -53,8 +52,11 @@ public class DrawingView extends View {
         drawPaint.setStrokeJoin(Paint.Join.ROUND);
         drawPaint.setStrokeCap(Paint.Cap.ROUND);
 
-        canvasPaint = new Paint(Paint.DITHER_FLAG);
+        brushSize = getResources().getInteger(R.integer.medium_size);
+        lastBrushSize = brushSize;
+        drawPaint.setStrokeWidth(brushSize);
 
+        canvasPaint = new Paint(Paint.DITHER_FLAG);
     }
 
     public void drawBmp(Bitmap bmp){
@@ -115,13 +117,6 @@ public class DrawingView extends View {
         invalidate();
         paintColor = Color.parseColor(newColor);
         drawPaint.setColor(paintColor);
-
-        if(brushSize<10)
-            brushSize = getResources().getInteger(R.integer.medium_size);
-        //lastBrushSize = brushSize;
-
-        drawPaint.setStrokeWidth(brushSize);
-
     }
 
     public void setBrushSize(float newSize){
@@ -154,5 +149,4 @@ public class DrawingView extends View {
         drawCanvas.drawColor(0, PorterDuff.Mode.CLEAR);
         invalidate();
     }
-
 }
