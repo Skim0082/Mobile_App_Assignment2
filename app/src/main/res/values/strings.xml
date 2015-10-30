@@ -5,8 +5,12 @@
     <string name="erase">Erase</string>
     <string name="save">Save</string>
     <string name="camera">Camera</string>
+    <string name="text">Text</string>
+    <string name="galley">Galley</string>
     <string name="paint">Paint</string>
     <string name="sml">Small</string>
     <string name="med">Medium</string>
     <string name="lrg">Large</string>
+    <string name="texton">Text Mode: On</string>
+    <string name="textoff">Text Mode: Off</string>
 </resources>

@@ -3,6 +3,7 @@ package com.example.sungjoekim.drawingexample;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -17,8 +18,11 @@ import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import java.io.ByteArrayOutputStream;
@@ -34,6 +38,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.view.View.OnClickListener;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends Activity implements OnClickListener {
@@ -42,10 +47,16 @@ public class MainActivity extends Activity implements OnClickListener {
     private float smallBrush, mediumBrush, largeBrush;
     private ImageButton currPaint, drawBtn, eraseBtn, newBtn, saveBtn, cameraBtn;
 
+    private ImageButton textBtn, galleyBtn;
+    public static boolean isTextMode = false;
+    private TextView texttModeTextView;
+    ImageButton imgPaintView, imgPaintText;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         drawView = (DrawingView)findViewById(R.id.drawing);
         LinearLayout paintLayout = (LinearLayout)findViewById(R.id.paint_colors);
@@ -60,6 +71,7 @@ public class MainActivity extends Activity implements OnClickListener {
         drawBtn.setOnClickListener(this);
 
         drawView.setBrushSize(mediumBrush);
+        drawView.mActivity = MainActivity.this;
 
         eraseBtn = (ImageButton)findViewById(R.id.erase_btn);
         eraseBtn.setOnClickListener(this);
@@ -73,6 +85,13 @@ public class MainActivity extends Activity implements OnClickListener {
         cameraBtn = (ImageButton)findViewById(R.id.camera_btn);
         cameraBtn.setOnClickListener(this);
 
+        texttModeTextView = (TextView) findViewById(R.id.textMode);
+
+        textBtn = (ImageButton) findViewById(R.id.text_btn);
+        textBtn.setOnClickListener(this);
+
+        galleyBtn = (ImageButton) findViewById(R.id.galley_btn);
+        galleyBtn.setOnClickListener(this);
     }
 
     @Override
@@ -108,7 +127,7 @@ public class MainActivity extends Activity implements OnClickListener {
                 }
             });
 
-            ImageButton largeBtn = (ImageButton)brushDialog.findViewById(R.id.large_brush);
+            ImageButton largeBtn = (ImageButton) brushDialog.findViewById(R.id.large_brush);
             largeBtn.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -121,14 +140,14 @@ public class MainActivity extends Activity implements OnClickListener {
 
             brushDialog.show();
 
-        }else if(view.getId()==R.id.erase_btn){
+        }else if(view.getId()==R.id.erase_btn) {
 
             //switch to erase - choose size
             final Dialog brushDialog = new Dialog(this);
             brushDialog.setTitle("Eraser size:");
             brushDialog.setContentView(R.layout.brush_chooser);
 
-            ImageButton smallBtn = (ImageButton)brushDialog.findViewById(R.id.small_brush);
+            ImageButton smallBtn = (ImageButton) brushDialog.findViewById(R.id.small_brush);
             smallBtn.setOnClickListener(new OnClickListener(){
                 @Override
                 public void onClick(View v) {
@@ -229,13 +248,65 @@ public class MainActivity extends Activity implements OnClickListener {
                     startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
                 }
             }
+        }else if(view.getId()==R.id.text_btn) {
+
+            isTextMode = isTextMode ? false: true;
+            String onOff = isTextMode ? "Text Mode: On" : "Text Mode: Off";
+            texttModeTextView.setText(onOff);
+            Toast.makeText(getApplicationContext(),onOff,Toast.LENGTH_SHORT).show();
+
+            if(!isTextMode){
+                paintClicked(imgPaintView);
+            }else{
+                if(imgPaintText!=null)
+                    paintClicked(imgPaintText);
+            }
+
+        }else if(view.getId()==R.id.galley_btn) {
+
+            Intent galleryIntent = new Intent(Intent.ACTION_PICK,
+                    android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            // Start the Intent
+            startActivityForResult(galleryIntent, RESULT_LOAD_IMG);
         }
     }
 
     static final int REQUEST_TAKE_PHOTO = 1;
+    static final int RESULT_LOAD_IMG = 2;
+    private String imgDecodableString;
 
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        try {
+            // When an Image is picked
+            if (requestCode == RESULT_LOAD_IMG && resultCode == RESULT_OK
+                    && null != data) {
+                // Get the Image from data
+
+                Uri selectedImage = data.getData();
+                String[] filePathColumn = { MediaStore.Images.Media.DATA };
+
+                // Get the cursor
+                Cursor cursor = getContentResolver().query(selectedImage,
+                        filePathColumn, null, null, null);
+                // Move to first row
+                cursor.moveToFirst();
+
+                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                imgDecodableString = cursor.getString(columnIndex);
+                cursor.close();
+                mCurrentPhotoPath = imgDecodableString;
+                galleryAddPic();
+                setPic();
+
+            }
+        } catch (Exception e) {
+            Toast.makeText(this, "Something went wrong", Toast.LENGTH_LONG)
+                    .show();
+        }
+
         if(resultCode == RESULT_OK && requestCode == REQUEST_TAKE_PHOTO){
 
             galleryAddPic();
@@ -257,8 +328,11 @@ public class MainActivity extends Activity implements OnClickListener {
         DrawingView mDrawingView =(DrawingView)findViewById(R.id.drawing);
 
         // Get the dimensions of the View
-        int targetW = mDrawingView.getWidth();
-        int targetH = mDrawingView.getHeight();
+        int targetW = 0;
+        int targetH = 0;
+
+        targetW = mDrawingView.getWidth();
+        targetH = mDrawingView.getHeight();
 
         // Get the dimensions of the bitmap
         BitmapFactory.Options bmOptions = new BitmapFactory.Options();
@@ -318,7 +392,6 @@ public class MainActivity extends Activity implements OnClickListener {
 
     public void paintClicked(View view){
         //use chosen color
-        //drawView.setBrushSize(drawView.getLastBrushSize());
 
         if(view!=currPaint){
 
@@ -326,6 +399,11 @@ public class MainActivity extends Activity implements OnClickListener {
 
             //update color
             ImageButton imgView = (ImageButton)view;
+            if(!isTextMode){
+                imgPaintView = imgView;
+            }else{
+                imgPaintText = imgView;
+            }
             String color = view.getTag().toString();
             drawView.setColor(color);
             imgView.setImageDrawable(getResources().getDrawable(R.drawable.paint_pressed));
@@ -333,5 +411,35 @@ public class MainActivity extends Activity implements OnClickListener {
             currPaint=(ImageButton)view;
             drawView.setBrushSize(drawView.getLastBrushSize());
         }
+    }
+
+    public void showInputDialog() {
+
+        LayoutInflater layoutInflater = LayoutInflater.from(MainActivity.this);
+        View promptView = layoutInflater.inflate(R.layout.input_dialog, null);
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
+        alertDialogBuilder.setView(promptView);
+
+        final EditText editText = (EditText) promptView.findViewById(R.id.edittext);
+
+        // setup a dialog window
+        alertDialogBuilder.setCancelable(false)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+
+                        drawView.drawText(editText.getText().toString());
+                        //isTextMode = true;
+                    }
+                })
+                .setNegativeButton("Cancel",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        });
+
+        // create an alert dialog
+        AlertDialog alert = alertDialogBuilder.create();
+        alert.show();
     }
 }

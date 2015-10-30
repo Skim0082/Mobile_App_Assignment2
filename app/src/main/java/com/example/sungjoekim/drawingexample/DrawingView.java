@@ -1,7 +1,6 @@
 package com.example.sungjoekim.drawingexample;
 
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.view.View;
 import android.content.Context;
@@ -14,18 +13,22 @@ import android.view.MotionEvent;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.util.TypedValue;
+import android.widget.TextView;
 
 /**
  * Created by JOE on 2015-10-23.
  */
 public class DrawingView extends View {
 
+    public MainActivity mActivity;
+
     //drawing path
     private Path drawPath;
     //drawing and canvas paint
-    private Paint drawPaint, canvasPaint;
+    private Paint drawPaint, canvasPaint, textPaint;
     //initial color
     private int paintColor = 0xFF660000;
+    public int paintTempColor = 0xFF660000;
     //canvas
     private Canvas drawCanvas;
     //canvas bitmap
@@ -33,6 +36,9 @@ public class DrawingView extends View {
     private float brushSize, lastBrushSize;
 
     private boolean erase=false;
+
+    public static int positionX, positionY;
+
 
     public DrawingView(Context context, AttributeSet attrs){
         super(context, attrs);
@@ -57,6 +63,12 @@ public class DrawingView extends View {
         drawPaint.setStrokeWidth(brushSize);
 
         canvasPaint = new Paint(Paint.DITHER_FLAG);
+
+        textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        textPaint.setTextSize(70);
+        textPaint.setColor(Color.BLACK);
+        textPaint.setStyle(Paint.Style.FILL);
+
     }
 
     public void drawBmp(Bitmap bmp){
@@ -67,7 +79,21 @@ public class DrawingView extends View {
         bh = bmp.getHeight();
 
         drawCanvas.drawRect(0, 0, bw, bh, canvasPaint);
-        drawCanvas.drawBitmap(bmp, null, new Rect(0,0,bw,bh),null);
+        drawCanvas.drawBitmap(bmp, null, new Rect(0, 0, bw, bh), null);
+    }
+
+    public void drawText(String inputText){
+        if(MainActivity.isTextMode){
+
+            if(inputText !="" && inputText != null){
+                //System.out.println("X & Y" + positionX + ":" + positionY);
+                drawCanvas.drawText(inputText, positionX, positionY, textPaint);
+                inputText = "";
+                positionX = 0;
+                positionY = 0;
+                invalidate();
+            }
+        }
     }
 
     @Override
@@ -82,7 +108,6 @@ public class DrawingView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         //draw view
-
         canvas.drawBitmap(canvasBitmap, 0, 0, canvasPaint);
         canvas.drawPath(drawPath, drawPaint);
     }
@@ -95,14 +120,24 @@ public class DrawingView extends View {
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                drawPath.moveTo(touchX, touchY);
+                if(MainActivity.isTextMode) {
+                    positionX = (int) touchX;
+                    positionY = (int) touchY;
+                    mActivity.showInputDialog();
+                }else {
+                    drawPath.moveTo(touchX, touchY);
+                }
                 break;
             case MotionEvent.ACTION_MOVE:
-                drawPath.lineTo(touchX, touchY);
+                if(!MainActivity.isTextMode){
+                    drawPath.lineTo(touchX, touchY);
+                }
                 break;
             case MotionEvent.ACTION_UP:
-                drawCanvas.drawPath(drawPath, drawPaint);
-                drawPath.reset();
+                if(!MainActivity.isTextMode) {
+                    drawCanvas.drawPath(drawPath, drawPaint);
+                    drawPath.reset();
+                }
                 break;
             default:
                 return false;
@@ -115,8 +150,14 @@ public class DrawingView extends View {
     public void setColor(String newColor){
         //set color
         invalidate();
-        paintColor = Color.parseColor(newColor);
-        drawPaint.setColor(paintColor);
+        if(MainActivity.isTextMode){
+            paintColor = Color.parseColor(newColor);
+            textPaint.setColor(paintColor);
+        }else{
+            paintColor = Color.parseColor(newColor);
+            drawPaint.setColor(paintColor);
+            paintTempColor = paintColor;
+        }
     }
 
     public void setBrushSize(float newSize){
