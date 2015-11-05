@@ -1,35 +1,22 @@
 package com.example.sungjoekim.drawingexample;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.ColorMatrix;
-import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Matrix;
-import android.graphics.Paint;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Environment;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
-
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
@@ -46,7 +33,6 @@ public class MainActivity extends Activity implements OnClickListener {
     private DrawingView drawView;
     private float smallBrush, mediumBrush, largeBrush;
     private ImageButton currPaint, drawBtn, eraseBtn, newBtn, saveBtn, cameraBtn;
-
     private ImageButton textBtn, galleyBtn;
     public static boolean isTextMode = false;
     private TextView texttModeTextView;
@@ -194,7 +180,9 @@ public class MainActivity extends Activity implements OnClickListener {
                 }
             });
             newDialog.show();
+
         }else if(view.getId()==R.id.save_btn){
+
             //save drawing
             AlertDialog.Builder saveDialog = new AlertDialog.Builder(this);
             saveDialog.setTitle("Save drawing");
@@ -239,7 +227,6 @@ public class MainActivity extends Activity implements OnClickListener {
                     photoFile = createImageFile();
                 } catch (IOException ex) {
                     // Error occurred while creating the File
-                    int aaa = 0;
                 }
                 // Continue only if the File was successfully created
                 if (photoFile != null) {
@@ -248,6 +235,7 @@ public class MainActivity extends Activity implements OnClickListener {
                     startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
                 }
             }
+
         }else if(view.getId()==R.id.text_btn) {
 
             isTextMode = isTextMode ? false: true;
@@ -284,7 +272,6 @@ public class MainActivity extends Activity implements OnClickListener {
             if (requestCode == RESULT_LOAD_IMG && resultCode == RESULT_OK
                     && null != data) {
                 // Get the Image from data
-
                 Uri selectedImage = data.getData();
                 String[] filePathColumn = { MediaStore.Images.Media.DATA };
 
@@ -392,7 +379,6 @@ public class MainActivity extends Activity implements OnClickListener {
 
     public void paintClicked(View view){
         //use chosen color
-
         if(view!=currPaint){
 
             drawView.setErase(false);
