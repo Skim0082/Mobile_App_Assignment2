@@ -244,7 +244,8 @@ public class MainActivity extends Activity implements OnClickListener {
             Toast.makeText(getApplicationContext(),onOff,Toast.LENGTH_SHORT).show();
 
             if(!isTextMode){
-                paintClicked(imgPaintView);
+                if(imgPaintView!=null)
+                    paintClicked(imgPaintView);
             }else{
                 if(imgPaintText!=null)
                     paintClicked(imgPaintText);
