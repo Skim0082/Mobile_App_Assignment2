@@ -13,10 +13,9 @@ import android.view.MotionEvent;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.util.TypedValue;
-import android.widget.TextView;
 
 /**
- * Created by JOE on 2015-10-23.
+ * Created by SUNGJOE on 2015-10-23.
  */
 public class DrawingView extends View {
 
@@ -37,8 +36,7 @@ public class DrawingView extends View {
 
     private boolean erase=false;
 
-    public static int positionX, positionY;
-
+    private int positionX, positionY;
 
     public DrawingView(Context context, AttributeSet attrs){
         super(context, attrs);
@@ -86,7 +84,7 @@ public class DrawingView extends View {
         if(MainActivity.isTextMode){
 
             if(inputText !="" && inputText != null){
-                //System.out.println("X & Y" + positionX + ":" + positionY);
+
                 drawCanvas.drawText(inputText, positionX, positionY, textPaint);
                 inputText = "";
                 positionX = 0;
@@ -180,7 +178,6 @@ public class DrawingView extends View {
         erase=isErase;
         if(erase){
             drawPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
-            //this.setColor("#FFFFFF");
         }else{
             drawPaint.setXfermode(null);
         }
