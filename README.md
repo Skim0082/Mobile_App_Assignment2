@@ -9,5 +9,5 @@
 
 ![Build Status](https://github.com/Skim0082/Mobile_App_Assignment2/blob/master/imageprocessing1.png)
 ![Build Status](https://github.com/Skim0082/Mobile_App_Assignment2/blob/master/imageprocessing2b.png)
-![Build Status](https://github.com/Skim0082/Mobile_App_Assignment2/blob/master/imageprocessing5b.png)
+![Build Status](https://github.com/Skim0082/Mobile_App_Assignment2/blob/master/imageprocessing5.png)
 
