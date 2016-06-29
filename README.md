@@ -1,7 +1,7 @@
 #Image Processing
 ##Mobile Application Design Assignment
 ###Date: Nov. 2015,	 Role: Individual Work
--	Image Processing, GitHub
+-	Android, Java
 -	Loading photo on Canvas with camera app of mobile device
 -	Finger painting overlays on the photo,
 -	Drawing textual comments overlays on the photo
